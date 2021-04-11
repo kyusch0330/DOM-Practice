@@ -14,6 +14,7 @@ const myColor={
   _blue:"#6060F0",
   _yellow:"#C0C030",
   _green:"#20E020",
+  _red:"#C03030",
 }
 
 const body = document.body;
@@ -151,9 +152,12 @@ body.style.flexFlow="column nowrap";
   childForReplace.setAttribute("style","background:red;");
  
   let timeoutId, i=1,j=1,pi=0,pj=0; //timeoutId: setInterval 중단을 위한 값 , i,j : 복사본 넣을 위치, pi,pj : 복구를 위한 직전 i,j의 인덱스
-  
+  let onCirculation = false; //중복실행 방지
   function circulateChilds(){
-      timeoutId = setInterval(changeNode,500); //n miliseconds 간격으로 반복
+    if(onCirculation===true) return; //순환중이 아닐때만 실행
+    i=1;j=1;pi=0;pj=0;
+    onCirculation=true;
+    timeoutId = setInterval(changeNode,500); //n miliseconds 간격으로 반복
   }
 
   let tmpNode; // 복구를 위한 임시 노드
@@ -167,6 +171,7 @@ body.style.flexFlow="column nowrap";
         clearInterval(timeoutId); //setInterval을 중지
         // 최종적으로 이전 노드를 원상복구해준다. 
         body.childNodes[pi].replaceChild(tmpNode,body.childNodes[pi].childNodes[pj]);
+        onCirculation=false;//실행중이 아님으로 전환
       }
       return;
     }
@@ -207,6 +212,7 @@ body.style.flexFlow="column nowrap";
 
         // 최종적으로 이전 노드를 원상복구해준다. 
         body.childNodes[pi].replaceChild(tmpNode,body.childNodes[pi].childNodes[pj]);
+        onCirculation=false; //실행중이 아님 -> 아래 실행버튼 재기능
       }
     }
   }
@@ -214,6 +220,18 @@ body.style.flexFlow="column nowrap";
   circulateChilds();
 }
 
+/* 빨간배경 노드 순환 다시하기 버튼 */
+{
+  const circulateBtn = document.createElement("button");
+  const btnStyle = document.createAttribute("style");
+  btnStyle.value="width:200px;height:100px;margin:50px;color:white;font-size:16px;";
+  circulateBtn.setAttributeNode(btnStyle);
+  circulateBtn.style.backgroundColor=myColor._red;
+  circulateBtn.innerHTML = "circulate";
+  
+  circulateBtn.addEventListener("click",circulateChilds);
+  body.appendChild(circulateBtn);
+}
 
 
 
